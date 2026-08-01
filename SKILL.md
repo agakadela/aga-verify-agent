@@ -14,7 +14,6 @@ Ask what the agent was authorized to do, which snapshot is under review, what
 it claimed, which evidence is bound to that snapshot, what remains unverified,
 and what the user should do next. Do not substitute the broader question `Is
 the code good?`; that belongs to code review.
-
 This is an evidence gate, not code review, runtime testing, or merge approval.
 
 The output must always end with **Next Action**.
@@ -28,8 +27,8 @@ The output must always end with **Next Action**.
   supported by an inspectable raw artifact tied to the reviewed snapshot.
 - A passing command proves only what that command covers.
 - A reasonable diff can still solve the wrong task.
-- `VERIFIED` describes task fulfillment and claims for one identified snapshot.
-  It does not mean code review passed or merge is allowed.
+- `VERIFIED` describes task fulfillment for one identified snapshot. Downstream
+  review, merge, deploy, or release claims stay separate in the claim matrix and workflow action.
 - Missing access is not certainty. Name it under `Cannot Verify` and decide
   whether it blocks the next gate.
 
@@ -54,9 +53,9 @@ says `fixed`, `done`, `implemented`, `verified`, or `tests pass`.
 Choose the mode from the behavior and risk changed, not merely words appearing
 in a file:
 
-- **Light Mode:** copy, documentation-only edits that do not change executable
+- **Light Mode:** copy or documentation-only edits that do not change executable
   behavior or operational safeguards, trivial styling, one isolated UI state,
-  or another small low-risk change. Usually 10-20 lines.
+  or another small low-risk change. Usually 15-30 lines.
 - **Standard Mode:** normal bug fix, feature slice, commit, or PR.
 - **High-Risk Mode:** behavior, schema, configuration, or operational
   instructions that materially affect auth, authorization, tenant data,
@@ -377,15 +376,18 @@ runtime behavior, and docs that should have changed.
 
 Keep this list short enough to reduce review burden.
 
+In Standard and High-Risk outputs, keep details in the main `Human Inspection First` section.
+In `Next Action`, name only the first file/area or refer above; Light Mode may keep it there.
+
 ### 12. Issue A Verification Verdict
 
 Choose one:
 
-- **VERIFIED:** the agent's task fulfillment and claims are supported for the
-  identified repository snapshot. The contract is authoritative or human-
-  accepted, material evidence is snapshot-bound, and remaining cannot-verify
-  items do not block verification. This does not mean review passed or merge is
-  allowed.
+- **VERIFIED:** the accepted task is fulfilled for the identified snapshot. The
+  contract is authoritative or human-accepted, material task evidence is bound,
+  and remaining cannot-verify items do not block verification. Downstream review,
+  merge, deploy, or release claims stay separate in the claim matrix and workflow
+  action; unsupported downstream claims do not change the task-fulfillment verdict.
 - **PARTIALLY_VERIFIED:** the core work appears aligned, but important proof is
   missing, rejected as unbound, or only part of a claim is supported. Also the
   maximum verdict when the best available contract is an agent-derived
@@ -399,9 +401,9 @@ Choose one:
   there is serious scope drift, contradiction, broken behavior, weakened tests,
   unsafe migration/config, or another merge blocker.
 
-The verdict answers only whether this agent work is verified. It does not
-collapse testing, code review, release approval, or merge authority into the
-same result.
+The verdict answers only whether the accepted task is verified for this snapshot.
+It does not collapse testing, code review, release approval, or merge authority
+into the same result.
 
 ### 13. Route The Workflow Action
 

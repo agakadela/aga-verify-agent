@@ -121,7 +121,7 @@ Next Action:
 - Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
-- Human inspection first:
+- Human inspection first: [first file/area or "See Human Inspection First above"]
 - Verification needed before merge:
 - Do not:
 ```
@@ -172,7 +172,7 @@ Next Action:
 - Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
-- Human inspection first:
+- Human inspection first: [first file/area or "See Human Inspection First above"]
 - Verification needed before merge:
 - Do not:
 ```
