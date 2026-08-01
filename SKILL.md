@@ -1,6 +1,6 @@
 ---
 name: aga-verify-agent
-description: Evidence gate for completed AI coding agent work. Use after an agent reports a task, bug fix, feature, commit, or PR as complete to verify the authoritative task contract, bind claims and evidence to the exact reviewed repository snapshot, detect misalignment and scope drift, name cannot-verify items, and choose the next workflow action. This is not code review, runtime testing, or merge approval; run required code review separately. Invoke explicitly with $aga-verify-agent.
+description: Verify completed AI coding-agent work against the authoritative task and exact repository snapshot. Use after an agent reports a task, fix, feature, commit, or PR complete to check claims, evidence provenance, scope drift, and the next workflow action. Not code review, runtime testing, or merge approval. Invoke explicitly with $aga-verify-agent.
 ---
 
 # Aga Verify Agent
@@ -10,45 +10,16 @@ description: Evidence gate for completed AI coding agent work. Use after an agen
 Verify completed work from an AI coding agent before the user trusts it,
 continues from it, or sends it to the next workflow gate.
 
-Do not ask first:
-
-```text
-Is the code good?
-```
-
-Ask:
-
-```text
-What was the agent authorized to do?
-Which exact repository snapshot is under review?
-What did the agent claim?
-Which evidence is bound to that snapshot?
-What remains unsupported or cannot be verified?
-What should the user do next?
-```
+Ask what the agent was authorized to do, which snapshot is under review, what
+it claimed, which evidence is bound to that snapshot, what remains unverified,
+and what the user should do next. Do not substitute the broader question `Is
+the code good?`; that belongs to code review.
 
 This is an evidence gate, not code review, runtime testing, or merge approval.
-
-```text
-implementation agent completes work
-→ $aga-verify-agent
-→ Next Action
-→ required test / code review / targeted fix / split / revert / merge candidate
-```
 
 The output must always end with **Next Action**.
 
 ## Non-Negotiable Principles
-
-```text
-task authority
-→ reviewed snapshot
-→ agent claims
-→ snapshot-bound evidence
-→ gaps and risk
-→ verification verdict
-→ workflow action
-```
 
 - The agent final answer is a source of claims, not evidence or task authority.
 - Evidence supports a claim only when its provenance and snapshot match the
@@ -64,22 +35,12 @@ task authority
 
 ## Verification Is Not Code Review
 
-Keep these checks separate:
-
-| Agent-work verification | Code review |
-| --- | --- |
-| Asks whether the agent fulfilled the accepted task | Asks whether the implementation is correct, safe, clear, and maintainable |
-| Checks agent claims against snapshot-bound evidence | Inspects code for bugs, design problems, security issues, architectural fit, and maintainability |
-| Detects stale evidence, misalignment, unsupported claims, and scope drift | Produces findings about implementation quality and engineering risk |
-| Returns a verification verdict and next workflow action | Returns review findings and the project's review decision |
-
-One does not imply the other:
-
-- verified work can still fail code review;
-- well-written code can still be misaligned with the accepted task;
-- passing this skill never waives a required code review;
-- code review must inspect the same candidate snapshot or be repeated after the
-  candidate changes.
+Keep these checks separate. Verification asks whether the agent fulfilled the
+accepted task and whether its claims have snapshot-bound evidence. Code review
+asks whether the implementation is correct, safe, clear, maintainable, and a
+good architectural fit. Either can pass while the other fails. Passing this
+skill never waives code review, and review must inspect the same candidate or
+be repeated after it changes.
 
 Default a `VERIFIED` result to `PROCEED TO CODE REVIEW` unless a separate code
 review is already complete and bound to the same snapshot.
@@ -90,14 +51,21 @@ Use this skill after an AI coding agent completes a task, bug fix, feature
 slice, commit, PR, code-generation session, rescue change, or final answer that
 says `fixed`, `done`, `implemented`, `verified`, or `tests pass`.
 
-Choose one mode:
+Choose the mode from the behavior and risk changed, not merely words appearing
+in a file:
 
-- **Light Mode:** copy, docs, trivial styling, one isolated UI state, or another
-  small low-risk change. Usually 10-20 lines.
+- **Light Mode:** copy, documentation-only edits that do not change executable
+  behavior or operational safeguards, trivial styling, one isolated UI state,
+  or another small low-risk change. Usually 10-20 lines.
 - **Standard Mode:** normal bug fix, feature slice, commit, or PR.
-- **High-Risk Mode:** auth, authorization, tenant data, payments, migrations,
-  secrets, production config, AI costs/actions, tool actions, external provider
-  callbacks, or another material trust boundary.
+- **High-Risk Mode:** behavior, schema, configuration, or operational
+  instructions that materially affect auth, authorization, tenant data,
+  payments, migrations, secrets, production config, AI costs/actions, tool
+  actions, external callbacks, or another trust boundary.
+
+A documentation edit that only mentions a high-risk domain remains Light Mode.
+Use High-Risk Mode when the documentation itself changes an operational
+safeguard, execution instruction, production decision, or source of truth.
 
 Every mode uses a task contract, minimum Evidence Identity, explicit cannot-
 verify items, a verification verdict, and a separate workflow action.
@@ -136,18 +104,10 @@ If verification finds a problem, stop and report it. Do not silently fix it.
 
 ## Required Context
 
-Inspect only the smallest sufficient context:
-
-- authoritative task source and acceptance criteria;
-- human corrections issued during the work;
-- agent final answer and other agent-authored claims;
-- repository identity, branch, base, candidate snapshot, and worktree state;
-- diff or changed files attributable to the task;
-- relevant tests, runtime observations, logs, screenshots, CI artifacts, and
-  database/provider evidence;
-- relevant architecture, contracts, risk documents, and version-sensitive
-  official sources;
-- known access and environment limitations.
+Inspect only the smallest sufficient context: the task and human corrections;
+agent-authored claims; repository, base, candidate, worktree, and attributable
+diff; relevant raw evidence; applicable architecture or current primary
+sources; and known access or environment limits.
 
 Do not load the whole repository or all project history merely because it is
 available. Follow the repository's own instructions and source-of-truth map.
@@ -163,16 +123,16 @@ Authority hierarchy, strongest first:
 **Authoritative**
 
 - original user instruction;
-- accepted acceptance criteria;
-- approved task in a project plan or task file;
-- accepted issue or specification;
+- acceptance criteria accepted before or during implementation;
+- task, issue, specification, or project plan approved before or during
+  implementation;
 - user corrections issued during the work.
 
 **Human-accepted reconstruction**
 
 - PR description accepted before implementation;
 - implementation plan explicitly accepted by the user;
-- another reconstruction explicitly confirmed by the user.
+- another reconstruction explicitly confirmed before implementation.
 
 **Agent-derived assumption**
 
@@ -183,6 +143,13 @@ Authority hierarchy, strongest first:
 
 Agent-derived material may explain what the agent believes it did. It cannot by
 itself define what the agent was required to do.
+
+Record when the contract was accepted. A source created or materially rewritten
+after implementation cannot prove the agent's original authorization. Post-hoc
+human acceptance may approve the delivered outcome, but it does not rewrite the
+original task or raise original task fulfillment above `PARTIALLY_VERIFIED`
+without independent contemporaneous task evidence. If the user adopts the
+outcome as a new task, report original alignment separately.
 
 Output:
 
@@ -206,7 +173,8 @@ If no authoritative or human-accepted contract exists, the maximum verdict is
 to judge alignment, use `NOT_VERIFIED`.
 
 When sources conflict, the latest explicit user correction overrides earlier
-task text. Do not let an agent-authored summary override a human decision.
+task text only when the correction was issued during the work. Do not let an
+agent-authored or post-hoc summary rewrite the original authorization.
 
 ### 2. Extract Agent Claims
 
@@ -222,6 +190,10 @@ agent-authored output. Separate:
 Treat `fixed`, `done`, `implemented`, `verified`, `works`, `all tests pass`, and
 `no regressions` as claims requiring their own support.
 
+If no agent-authored report exists, state `No agent-authored claims provided`.
+Do not infer claims from the diff. Continue by comparing the task with the work
+and evidence; omit empty claim rows and limit the verdict to task fulfillment.
+
 ### 3. Establish Evidence Identity
 
 Identify the exact change under review before treating any artifact as evidence.
@@ -233,7 +205,9 @@ Evidence Identity:
 - Repository:
 - Branch:
 - Base commit:
-- Candidate commit or dirty-worktree snapshot:
+- Candidate commit:
+- Worktree state: clean / dirty
+- Dirty snapshot identity, when applicable:
 - Pre-existing changes:
 - Evidence source: verifier-run / CI or raw artifact / agent-reported
 - Command and exit code:
@@ -249,9 +223,15 @@ In Light Mode, the minimum is still:
 
 Apply these rules:
 
-- Record a commit SHA when a commit exists.
-- For dirty worktrees, identify changed files and the diff or content snapshot
-  used for review. Do not imply stronger reproducibility than exists.
+- Treat evidence as belonging to a commit only when it ran from a clean checkout
+  of that commit.
+- Before a verifier-run command, capture worktree status. If it is dirty, bind
+  the evidence to the base SHA plus staged, unstaged, and relevant untracked
+  files using a diff, content snapshot, or stable fingerprint. Label the result
+  as dirty-snapshot evidence, never commit-only evidence.
+- Capture worktree status again after commands that may change tracked or
+  relevant untracked files. If the state changed, identify the post-command
+  snapshot or reject the result as insufficiently bound.
 - Separate pre-existing human or unrelated changes from agent-attributable
   work. If no baseline exists, state that attribution cannot be confirmed.
 - Reject stale, cross-branch, cross-repository, cross-environment, or otherwise
@@ -262,20 +242,9 @@ Apply these rules:
 
 ### 4. Inventory Evidence
 
-List evidence before interpreting it:
-
-```text
-Evidence Inventory:
-- Diff and changed files:
-- Tests/lint/build:
-- Runtime/browser:
-- Database/provider/dashboard:
-- Screenshots/logs/raw outputs:
-- Current official-source evidence:
-- Docs:
-- Rejected as unbound or stale:
-- Missing:
-```
+Before interpreting evidence, inventory the relevant diff, checks, runtime or
+provider observations, raw artifacts, current primary sources, documentation,
+rejected stale/unbound artifacts, and missing proof.
 
 Rank provenance:
 
@@ -350,32 +319,19 @@ Scope Drift:
 - Risk: Low / Medium / High
 ```
 
-- **Low:** docs, tests, formatting, tiny cleanup. Mention it.
+- **Low:** documentation, formatting, tiny cleanup, or narrowly additive tests
+  that do not weaken coverage or alter production behavior. Mention it.
 - **Medium:** shared logic, component structure, output format, CLI flags, API
-  shape, non-trivial UI structure. Hold until inspected; split if unrelated.
+  shape, non-trivial UI structure, or material test rewrites. Hold until
+  inspected; split if unrelated.
 - **High:** auth, payments, data access, migrations, secrets, production config,
-  AI actions, tool permissions, destructive operations. Stop and do not merge.
+  AI actions, tool permissions, destructive operations, or deleted/weakened
+  safeguards and regression tests. Stop and do not merge.
 
 ### 8. Judge Verification Fit
 
-Ask whether the right proof was used, not merely whether tests ran.
-
-| Task type | Minimum useful proof |
-| --- | --- |
-| Markdown/docs | readback, format, and relevant link/path check |
-| Pure logic | relevant unit tests including material edge cases |
-| CLI | command output showing changed behavior |
-| API/server action | request/response, validation/error behavior, shared contract alignment |
-| UI/frontend state | browser/state check covering material new states |
-| RAG/retrieval | sample query, retrieved material, citations, groundedness check |
-| Auth/data isolation | authorized case plus two-user or equivalent negative isolation test |
-| Payment/product state | authoritative payment result plus resulting state at the architecture-declared source of truth |
-| Migration/schema | migration artifact, data-risk note, rollback/backfill where relevant; backup/PITR before production execution |
-| AI endpoint | auth, limits/cost, retry, logging, failure path, output validation |
-| Tool action | permission, approval where needed, audit trail, result validation, failure/retry behavior |
-| Provider/webhook | contract/authenticity, relevant test or replay, idempotency/ordering behavior |
-| Version-sensitive behavior | installed version plus current primary source and matching implementation |
-| Triggered observability | named operational question plus observable test event/error/request or explicit cannot-verify |
+Ask whether the right proof was used, not merely whether tests ran. Read
+`references/evidence-fit.md` and apply only the rows triggered by the task.
 
 Output:
 
@@ -465,7 +421,10 @@ Default routing:
 
 - `VERIFIED` → `PROCEED TO CODE REVIEW` unless a separate review is already
   complete for the same snapshot; then proceed to the next incomplete gate.
-- `PARTIALLY_VERIFIED` → `HOLD`; run or obtain the exact missing proof.
+- `PARTIALLY_VERIFIED` → `HOLD`; run or obtain the exact missing proof. When the
+  only limitation is explicitly accepted post-hoc scope and original alignment
+  remains recorded, `PROCEED TO CODE REVIEW` is allowed; post-hoc acceptance
+  never substitutes for missing evidence.
 - `NOT_VERIFIED` → `HOLD` or `DO NOT MERGE`; obtain evidence or reconstruct the
   contract before continuing.
 - `MISALIGNED` → `DO NOT MERGE` or `SPLIT / ISOLATE`.
@@ -492,7 +451,7 @@ End with:
 Next Action:
 - Verification verdict:
 - Workflow action:
-- Code review status: required / complete for candidate
+- Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
 - Human inspection first:
@@ -502,23 +461,19 @@ Next Action:
 
 ## Binding High-Risk Rules
 
-High-risk areas override normal confidence. A source diff alone is never enough.
+High-risk behavioral or operational changes override normal confidence. A
+source diff alone is never enough; documentation-only mentions do not trigger
+these gates.
 
-- **Auth/data isolation:** require an authorized case and a two-user or
-  equivalent negative isolation test; confirm enforcement at the architecture-
-  declared boundary.
-- **Payments/product access:** confirm the authoritative payment result, then
-  confirm resulting product or access state at the source of truth declared by
-  the architecture. For webhook-driven SaaS, verify event authenticity,
-  processing, idempotent transition, and local entitlement/product state.
-- **Migrations:** require the migration artifact and data-risk treatment;
-  require rollback/backfill when relevant and backup/PITR confirmation before
-  production execution.
-- **AI endpoints and tool actions:** require permissions, input/output limits,
-  cost/retry boundaries, validation, observable failure behavior, and human
-  approval/audit trail where the action risk requires them.
-- **Secrets/env/production config:** source inspection cannot confirm provider
-  or secret-manager state; require environment evidence when it matters.
+- **Auth/data isolation:** require positive and negative access proof at the
+  architecture-declared enforcement boundary.
+- **Payments/product access:** require the authoritative payment result and its
+  resulting product state, including replay/idempotency where applicable.
+- **Migrations:** require the artifact, data-risk treatment, and relevant
+  rollback/backfill; require backup/PITR proof before production execution.
+- **AI/tool actions:** require permissions, limits, validation, observable
+  failures, and approval/auditability where risk requires them.
+- **Secrets/config:** require environment evidence when live state matters.
 
 Read `references/high-risk-gates.md` for the full gate selected by the change.
 
@@ -526,6 +481,7 @@ Read `references/high-risk-gates.md` for the full gate selected by the change.
 
 - Read `references/output-templates.md` before producing the chosen mode's
   final output.
+- Read `references/evidence-fit.md` when judging whether proof matches the task.
 - Read `references/high-risk-gates.md` whenever High-Risk Mode applies.
 - Read `references/examples-and-red-flags.md` only when classification is
   ambiguous, the result needs calibration, or the skill is being taught or
@@ -533,13 +489,9 @@ Read `references/high-risk-gates.md` for the full gate selected by the change.
 
 ## Done Means
 
-The skill is complete only when it gives the user:
-
-1. an authoritative or explicitly limited task contract;
-2. the exact reviewed snapshot and evidence provenance;
-3. a factual verification verdict;
-4. the evidence, rejected evidence, and cannot-verify items behind it;
-5. the first place to inspect manually;
-6. a separate, exact next workflow action.
+The skill is complete only when it gives the user an authoritative or limited
+task contract, exact snapshot and provenance, factual verdict, supporting and
+rejected evidence, cannot-verify items, first manual inspection point, and a
+separate exact workflow action.
 
 If the result does not change what the user should do next, it is not done.
