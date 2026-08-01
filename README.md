@@ -23,6 +23,19 @@ For example, if the agent changed commit `B` but shows a passing test from
 commit `A`, the skill rejects that test as stale evidence and asks for a new run
 against commit `B`.
 
+## This is not code review
+
+The two checks answer different questions:
+
+- **Aga Verify Agent:** Did the agent complete the accepted task, and are its
+  claims supported by evidence from the exact code version being reviewed?
+- **Code review:** Is the implementation correct, safe, maintainable, and a good
+  fit for the system's design and architecture?
+
+You still need code review as a separate step. A change can pass verification
+and fail code review. It can also be well written but fail verification because
+it solves the wrong task.
+
 ## Installation
 
 Install it for your Codex user:
@@ -119,7 +132,7 @@ It also returns a separate next action, such as:
 
 ```text
 Verification verdict: VERIFIED
-Workflow action: PROCEED TO REVIEW
+Workflow action: PROCEED TO CODE REVIEW
 ```
 
 `VERIFIED` does not automatically mean `MERGE`. Code review, runtime testing,
@@ -135,7 +148,9 @@ the work from being treated as safe to merge.
 ## Boundaries
 
 The skill does not replace code review or runtime testing. It does not silently
-fix the implementation, merge, deploy, or publish anything.
+fix the implementation, merge, deploy, or publish anything. If the candidate
+changes after verification or review, the relevant checks must run again
+against the new candidate.
 
 The complete rules are in [`SKILL.md`](./SKILL.md). Detailed high-risk gates
 and output templates are in [`references/`](./references/).

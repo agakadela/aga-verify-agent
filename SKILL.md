@@ -1,14 +1,14 @@
 ---
 name: aga-verify-agent
-description: Workflow command. Evidence gate for completed AI coding agent work. Verifies whether the agent fulfilled an authoritative task contract by binding its claims and evidence to the exact reviewed repository snapshot, checking scope drift and docs truth, naming cannot-verify items, and routing Aga to the next workflow action. This is not code review or merge approval. Invoke explicitly with $aga-verify-agent.
+description: Evidence gate for completed AI coding agent work. Use after an agent reports a task, bug fix, feature, commit, or PR as complete to verify the authoritative task contract, bind claims and evidence to the exact reviewed repository snapshot, detect misalignment and scope drift, name cannot-verify items, and choose the next workflow action. This is not code review, runtime testing, or merge approval; run required code review separately. Invoke explicitly with $aga-verify-agent.
 ---
 
 # Aga Verify Agent
 
 ## Purpose
 
-Verify completed work from an AI coding agent before Aga trusts it, continues
-from it, or sends it to the next workflow gate.
+Verify completed work from an AI coding agent before the user trusts it,
+continues from it, or sends it to the next workflow gate.
 
 Do not ask first:
 
@@ -24,19 +24,19 @@ Which exact repository snapshot is under review?
 What did the agent claim?
 Which evidence is bound to that snapshot?
 What remains unsupported or cannot be verified?
-What should Aga do next?
+What should the user do next?
 ```
 
 This is an evidence gate, not code review, runtime testing, or merge approval.
 
 ```text
-$aga-build
+implementation agent completes work
 → $aga-verify-agent
-→ Aga Action
-→ required test / review / targeted fix / split / revert / merge candidate
+→ Next Action
+→ required test / code review / targeted fix / split / revert / merge candidate
 ```
 
-The output must always end with **Aga Action**.
+The output must always end with **Next Action**.
 
 ## Non-Negotiable Principles
 
@@ -61,6 +61,28 @@ task authority
   It does not mean code review passed or merge is allowed.
 - Missing access is not certainty. Name it under `Cannot Verify` and decide
   whether it blocks the next gate.
+
+## Verification Is Not Code Review
+
+Keep these checks separate:
+
+| Agent-work verification | Code review |
+| --- | --- |
+| Asks whether the agent fulfilled the accepted task | Asks whether the implementation is correct, safe, clear, and maintainable |
+| Checks agent claims against snapshot-bound evidence | Inspects code for bugs, design problems, security issues, architectural fit, and maintainability |
+| Detects stale evidence, misalignment, unsupported claims, and scope drift | Produces findings about implementation quality and engineering risk |
+| Returns a verification verdict and next workflow action | Returns review findings and the project's review decision |
+
+One does not imply the other:
+
+- verified work can still fail code review;
+- well-written code can still be misaligned with the accepted task;
+- passing this skill never waives a required code review;
+- code review must inspect the same candidate snapshot or be repeated after the
+  candidate changes.
+
+Default a `VERIFIED` result to `PROCEED TO CODE REVIEW` unless a separate code
+review is already complete and bound to the same snapshot.
 
 ## Use And Mode Selection
 
@@ -106,8 +128,8 @@ Do not by default:
 - refactor or clean up while checking;
 - install dependencies without authority;
 - alter migrations, auth, payments, env, provider state, or production config;
-- update `VERIFY_LOG` or workflow status unless the project workflow explicitly
-  grants this verifier that narrow write authority;
+- update a project verification record or workflow status unless the project
+  workflow explicitly grants this verifier that narrow write authority;
 - merge, deploy, publish, or perform another external mutation.
 
 If verification finds a problem, stop and report it. Do not silently fix it.
@@ -142,7 +164,7 @@ Authority hierarchy, strongest first:
 
 - original user instruction;
 - accepted acceptance criteria;
-- approved task in `PLAN.md`;
+- approved task in a project plan or task file;
 - accepted issue or specification;
 - user corrections issued during the work.
 
@@ -393,9 +415,9 @@ proof is required by the task, risk, or next workflow gate.
 
 ### 11. Direct Human Inspection
 
-Tell Aga where to look first. Prioritize the core task behavior, high-risk
-areas, scope drift, shared helpers, generated tests, unverified runtime
-behavior, and docs that should have changed.
+Tell the human owner where to look first. Prioritize the core task behavior,
+high-risk areas, scope drift, shared helpers, generated tests, unverified
+runtime behavior, and docs that should have changed.
 
 Keep this list short enough to reduce review burden.
 
@@ -430,7 +452,7 @@ same result.
 Choose the next action independently from the verification verdict:
 
 ```text
-PROCEED TO REVIEW
+PROCEED TO CODE REVIEW
 PROCEED TO TEST
 HOLD
 SPLIT / ISOLATE
@@ -441,8 +463,8 @@ MERGE CANDIDATE
 
 Default routing:
 
-- `VERIFIED` → proceed to any required review or test gate that has not yet
-  completed for the same snapshot.
+- `VERIFIED` → `PROCEED TO CODE REVIEW` unless a separate review is already
+  complete for the same snapshot; then proceed to the next incomplete gate.
 - `PARTIALLY_VERIFIED` → `HOLD`; run or obtain the exact missing proof.
 - `NOT_VERIFIED` → `HOLD` or `DO NOT MERGE`; obtain evidence or reconstruct the
   contract before continuing.
@@ -458,7 +480,8 @@ Use `MERGE CANDIDATE` only when all are true:
 - every required automated and runtime test completed for that same snapshot;
 - required docs and high-risk gates are satisfied;
 - no merge-blocking `Cannot Verify` item remains;
-- Aga understands the changed behavior and retains the merge decision.
+- the human owner understands the changed behavior and retains the merge
+  decision.
 
 Even then, this skill recommends a candidate state. It never performs the
 merge or grants authority that the user or project workflow did not grant.
@@ -466,14 +489,14 @@ merge or grants authority that the user or project workflow did not grant.
 End with:
 
 ```text
-Aga Action:
+Next Action:
 - Verification verdict:
 - Workflow action:
-- Your next action:
+- Code review status: required / complete for candidate
+- Human next action:
 - Agent next instruction:
 - Human inspection first:
 - Verification needed before merge:
-- VERIFY_LOG action:
 - Do not:
 ```
 
@@ -510,7 +533,7 @@ Read `references/high-risk-gates.md` for the full gate selected by the change.
 
 ## Done Means
 
-The skill is complete only when it gives Aga:
+The skill is complete only when it gives the user:
 
 1. an authoritative or explicitly limited task contract;
 2. the exact reviewed snapshot and evidence provenance;
@@ -519,4 +542,4 @@ The skill is complete only when it gives Aga:
 5. the first place to inspect manually;
 6. a separate, exact next workflow action.
 
-If the result does not change what Aga should do next, it is not done.
+If the result does not change what the user should do next, it is not done.

@@ -2,7 +2,7 @@
 
 Use only the template for the selected mode. Omit empty optional detail, but do
 not omit Evidence Identity, Contract Authority, Cannot Verify, the verdict, or
-the separate workflow action.
+the separate workflow action and code-review status.
 
 ## Contents
 
@@ -35,14 +35,14 @@ Task Vs Work:
 Cannot Verify:
 - ...
 
-Aga Action:
+Next Action:
 - Verification verdict:
 - Workflow action:
-- Your next action:
+- Code review status: required / complete for candidate
+- Human next action:
 - Agent next instruction:
 - Human inspection first:
 - Verification needed before merge:
-- VERIFY_LOG action:
 - Do not:
 ```
 
@@ -113,14 +113,14 @@ Human Inspection First:
 1. ...
 2. ...
 
-Aga Action:
+Next Action:
 - Verification verdict:
 - Workflow action:
-- Your next action:
+- Code review status: required / complete for candidate
+- Human next action:
 - Agent next instruction:
 - Human inspection first:
 - Verification needed before merge:
-- VERIFY_LOG action:
 - Do not:
 ```
 
@@ -163,12 +163,12 @@ Human Inspection First:
 1. ...
 2. ...
 
-Aga Action:
+Next Action:
 - Verification verdict:
 - Workflow action:
-- Your next action:
+- Code review status: required / complete for candidate
+- Human next action:
 - Agent next instruction:
 - Verification needed before merge:
-- VERIFY_LOG action:
 - Do not:
 ```

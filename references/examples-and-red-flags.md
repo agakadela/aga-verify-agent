@@ -66,6 +66,8 @@ Treat these as serious until resolved:
 - `The redirect worked.` It does not establish authoritative payment state.
 - `The UI hides the button.` UI hiding is not authorization.
 - `The old CI run is probably equivalent.` Evidence must match the candidate.
+- `Verification passed, so code review can be skipped.` The checks answer
+  different questions; complete required code review against the same candidate.
 - `Merge now, fix later.` Verification does not grant merge authority.
 
 ## Next-Instruction Patterns
