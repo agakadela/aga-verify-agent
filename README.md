@@ -155,4 +155,9 @@ against the new candidate.
 The complete rules are in [`SKILL.md`](./SKILL.md). Detailed high-risk gates
 and output templates are in [`references/`](./references/).
 
+## License
+
+MIT. You may use, modify, and distribute the skill under the terms in
+[`LICENSE`](./LICENSE).
+
 Created by [Aga Kadela](https://github.com/agakadela), Software Engineer.
