@@ -1,2 +1,7 @@
+interface:
+  display_name: "Aga Verify Agent"
+  short_description: "Verify AI agent work against evidence"
+  default_prompt: "Use $aga-verify-agent to verify completed agent work against its task and exact repository snapshot."
+
 policy:
   allow_implicit_invocation: false

@@ -54,7 +54,11 @@ git clone https://github.com/agakadela/aga-verify-agent.git \
   .agents/skills/aga-verify-agent
 ```
 
-Restart Codex after installation.
+Codex should detect the skill automatically. If it does not appear in `/skills`,
+restart Codex and try again.
+
+To update an installed copy, run `git pull --ff-only` inside its folder. To
+uninstall it, remove the `aga-verify-agent` folder from `.agents/skills`.
 
 ## How to use it
 

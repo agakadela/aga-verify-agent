@@ -3,6 +3,13 @@
 Consult this file only when classification is ambiguous, when teaching the
 workflow, or when evaluating the skill.
 
+## Contents
+
+- Status examples
+- Red flags
+- Common rationalizations
+- Next-instruction patterns
+
 ## Status Examples
 
 ### Unsupported
@@ -41,12 +48,32 @@ Contract authority: agent-derived assumption.
 Maximum verdict: PARTIALLY_VERIFIED.
 ```
 
+### Post-Hoc Contract
+
+```text
+Original task: Fix export without changing the label.
+Delivered work: Changes export and renames the label.
+Later statement: The new label is acceptable.
+Status: later acceptance approves the outcome but does not prove original task
+fulfillment; report the original misalignment separately.
+```
+
+### Dirty Snapshot
+
+```text
+Claim: Tests pass for candidate commit B.
+Evidence: Tests ran on B plus unstaged fix C.
+Status: unsupported for B alone; bind the result to the dirty snapshot or rerun
+from a clean checkout of B.
+```
+
 ## Red Flags
 
 Treat these as serious until resolved:
 
 - `fixed` or `verified` without relevant proof;
 - test output not tied to the candidate snapshot;
+- commit-only evidence recorded while the worktree was dirty;
 - no baseline separating pre-existing and agent changes;
 - `all tests pass` supported only by an agent summary;
 - changed files omitted from the final answer;

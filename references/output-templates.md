@@ -24,6 +24,7 @@ Task Contract And Authority:
 
 Evidence Identity:
 - Reviewed change/snapshot:
+- Worktree state and dirty snapshot identity:
 - Evidence executed against:
 - Evidence source:
 
@@ -38,7 +39,7 @@ Cannot Verify:
 Next Action:
 - Verification verdict:
 - Workflow action:
-- Code review status: required / complete for candidate
+- Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
 - Human inspection first:
@@ -72,6 +73,7 @@ Evidence Identity:
 - Repository / branch:
 - Base:
 - Candidate snapshot:
+- Worktree state and dirty snapshot identity:
 - Pre-existing changes:
 - Evidence source and environment:
 - Commands / exit codes / executed against:
@@ -116,7 +118,7 @@ Human Inspection First:
 Next Action:
 - Verification verdict:
 - Workflow action:
-- Code review status: required / complete for candidate
+- Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
 - Human inspection first:
@@ -139,6 +141,7 @@ High-Risk Area And Contract Authority:
 Evidence Identity:
 - Repository / branch / base:
 - Candidate snapshot:
+- Worktree state and dirty snapshot identity:
 - Pre-existing changes:
 - Evidence source and environment:
 - Commands / exit codes / executed against:
@@ -166,9 +169,10 @@ Human Inspection First:
 Next Action:
 - Verification verdict:
 - Workflow action:
-- Code review status: required / complete for candidate
+- Code review status: not ready - verification blocker / required / complete for candidate
 - Human next action:
 - Agent next instruction:
+- Human inspection first:
 - Verification needed before merge:
 - Do not:
 ```
