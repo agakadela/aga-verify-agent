@@ -14,7 +14,6 @@ Ask what the agent was authorized to do, which snapshot is under review, what
 it claimed, which evidence is bound to that snapshot, what remains unverified,
 and what the user should do next. Do not substitute the broader question `Is
 the code good?`; that belongs to code review.
-
 This is an evidence gate, not code review, runtime testing, or merge approval.
 
 The output must always end with **Next Action**.
@@ -54,9 +53,9 @@ says `fixed`, `done`, `implemented`, `verified`, or `tests pass`.
 Choose the mode from the behavior and risk changed, not merely words appearing
 in a file:
 
-- **Light Mode:** copy, documentation-only edits that do not change executable
+- **Light Mode:** copy or documentation-only edits that do not change executable
   behavior or operational safeguards, trivial styling, one isolated UI state,
-  or another small low-risk change. Usually 10-20 lines.
+  or another small low-risk change. Usually 15-30 lines.
 - **Standard Mode:** normal bug fix, feature slice, commit, or PR.
 - **High-Risk Mode:** behavior, schema, configuration, or operational
   instructions that materially affect auth, authorization, tenant data,
@@ -376,6 +375,9 @@ high-risk areas, scope drift, shared helpers, generated tests, unverified
 runtime behavior, and docs that should have changed.
 
 Keep this list short enough to reduce review burden.
+
+In Standard and High-Risk outputs, keep details in the main `Human Inspection First` section.
+In `Next Action`, name only the first file/area or refer above; Light Mode may keep it there.
 
 ### 12. Issue A Verification Verdict
 

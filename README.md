@@ -32,9 +32,9 @@ The two checks answer different questions:
 - **Code review:** Is the implementation correct, safe, maintainable, and a good
   fit for the system's design and architecture?
 
-You still need code review as a separate step. A change can pass verification
-and fail code review. It can also be well written but fail verification because
-it solves the wrong task.
+This skill never replaces code review required by your project. A change can
+pass verification and fail code review. It can also be well written but fail
+verification because it solves the wrong task.
 
 ## Installation
 
@@ -141,6 +141,51 @@ Workflow action: PROCEED TO CODE REVIEW
 
 `VERIFIED` does not automatically mean `MERGE`. Code review, runtime testing,
 or another project gate may still be required.
+
+### Complete example
+
+```text
+Task:
+Fix the README setup link without changing any setup instructions.
+
+Agent claim:
+Updated the link. All checks pass. Ready to merge.
+
+Available proof:
+- Candidate 4444444 is a clean checkout.
+- The verifier read back the diff and confirmed only the link changed.
+- The link target check exited 0 against candidate 4444444.
+
+Rejected proof:
+- "All checks pass" in the agent report is a claim, not raw evidence.
+
+Verification verdict: VERIFIED
+
+Next action:
+- Workflow action: PROCEED TO CODE REVIEW
+- Human inspection first: README setup link
+- Verification needed before merge: any remaining project-required gates
+```
+
+## Public validation
+
+The four versioned cases in [`tests/`](./tests/) cover a correct small change,
+a misaligned task, stale or dirty evidence, and a high-risk change with
+insufficient proof. Each case records its authoritative task, evidence identity,
+expected verdict and workflow action, plus the most recent real Codex result.
+They are behavioral evaluation fixtures, not deterministic unit tests.
+
+Run the structural validator locally (it has no gem dependencies):
+
+```bash
+ruby scripts/validate_structure.rb
+```
+
+The validator parses the YAML files, checks skill frontmatter and referenced
+paths, rejects broken internal Markdown links, and verifies the required case
+structure. GitHub Actions runs the same command for every push and pull request.
+Stable versions are marked in
+[`Tags`](https://github.com/agakadela/aga-verify-agent/tags).
 
 ## High-risk changes
 
