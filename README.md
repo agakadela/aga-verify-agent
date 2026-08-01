@@ -167,28 +167,6 @@ Next action:
 - Verification needed before merge: any remaining project-required gates
 ```
 
-## Public validation
-
-The four versioned cases in [`tests/`](./tests/) cover a correct small change,
-a misaligned task, stale or dirty evidence, and a high-risk change with
-insufficient proof. Each case records its authoritative task, evidence identity,
-expected verdict and workflow action, plus the most recent real Codex result.
-They are behavioral evaluation fixtures, not deterministic unit tests.
-
-Run the structural validator locally (it has no gem dependencies):
-
-```bash
-ruby scripts/validate_structure.rb
-```
-
-The validator parses the YAML files, checks skill frontmatter and referenced
-paths, rejects broken internal Markdown links, verifies the required case
-structure, and requires every `PASS` result to match its expected verdict and
-workflow action. GitHub Actions runs the same command for every push and pull
-request.
-Stable versions are marked in
-[`Tags`](https://github.com/agakadela/aga-verify-agent/tags).
-
 ## High-risk changes
 
 Auth, tenant data, payments, migrations, production configuration, AI actions,
