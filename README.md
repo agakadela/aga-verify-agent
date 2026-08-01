@@ -182,8 +182,10 @@ ruby scripts/validate_structure.rb
 ```
 
 The validator parses the YAML files, checks skill frontmatter and referenced
-paths, rejects broken internal Markdown links, and verifies the required case
-structure. GitHub Actions runs the same command for every push and pull request.
+paths, rejects broken internal Markdown links, verifies the required case
+structure, and requires every `PASS` result to match its expected verdict and
+workflow action. GitHub Actions runs the same command for every push and pull
+request.
 Stable versions are marked in
 [`Tags`](https://github.com/agakadela/aga-verify-agent/tags).
 

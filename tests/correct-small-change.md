@@ -32,8 +32,12 @@ other content change.
 
 `VERIFIED`
 
-The requested change and material claims are supported for the identified
-snapshot. The agent's merge-readiness claim does not itself authorize merge.
+The requested task is fulfilled for the identified snapshot. The separate
+merge-readiness claim is unsupported and does not change the task verdict.
+
+Unsupported claim:
+
+- Ready to merge. Required project gates have not completed.
 
 ## Expected Workflow Action
 
@@ -48,3 +52,4 @@ snapshot. The agent's merge-readiness claim does not itself authorize merge.
 - Result: PASS
 - Observed verdict: `VERIFIED`
 - Observed workflow action: `PROCEED TO CODE REVIEW`
+- Observed unsupported claim: Ready to merge
