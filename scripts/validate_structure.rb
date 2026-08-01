@@ -60,6 +60,11 @@ def frontmatter(path)
   parse_yaml(match[1], path.relative_path_from(ROOT).to_s)
 end
 
+def result_field(content, field)
+  raw = content[/^- #{Regexp.escape(field)}:\s*([^\r\n]+)$/, 1]
+  raw&.strip&.delete_prefix("`")&.delete_suffix("`")
+end
+
 skill_path = ROOT.join("SKILL.md")
 skill_metadata = frontmatter(skill_path)
 
@@ -116,12 +121,29 @@ CASE_FILES.each do |relative|
   ERRORS << "#{relative}: invalid or missing expected verdict" unless VERDICTS.include?(verdict)
   ERRORS << "#{relative}: invalid or missing expected workflow action" unless WORKFLOW_ACTIONS.include?(action)
 
-  %w[Date Runner Model Result].each do |field|
-    ERRORS << "#{relative}: Last Actual Result is missing #{field}" unless content.match?(/^- #{field}:\s+\S+/)
+  actual_fields = ["Date", "Runner", "Model", "Result", "Observed verdict", "Observed workflow action"]
+  actual_section = content.split("## Last Actual Result", 2)[1].to_s
+  actual = actual_fields.to_h { |field| [field, result_field(actual_section, field)] }
+  actual.each do |field, value|
+    ERRORS << "#{relative}: Last Actual Result is missing #{field}" if value.nil? || value.empty?
   end
 
-  if content.match?(/^- Result:\s+PENDING\b/)
+  result = actual["Result"]
+  if result == "PENDING"
     ERRORS << "#{relative}: behavioral case has not been run"
+  elsif result && !%w[PASS FAIL].include?(result)
+    ERRORS << "#{relative}: Result must be PASS or FAIL"
+  end
+
+  if result == "PASS"
+    observed_verdict = actual["Observed verdict"]
+    observed_action = actual["Observed workflow action"]
+    if verdict && observed_verdict && observed_verdict != verdict
+      ERRORS << "#{relative}: PASS observed verdict #{observed_verdict} does not match expected #{verdict}"
+    end
+    if action && observed_action && observed_action != action
+      ERRORS << "#{relative}: PASS observed workflow action #{observed_action} does not match expected #{action}"
+    end
   end
 end
 

@@ -27,8 +27,8 @@ The output must always end with **Next Action**.
   supported by an inspectable raw artifact tied to the reviewed snapshot.
 - A passing command proves only what that command covers.
 - A reasonable diff can still solve the wrong task.
-- `VERIFIED` describes task fulfillment and claims for one identified snapshot.
-  It does not mean code review passed or merge is allowed.
+- `VERIFIED` describes task fulfillment for one identified snapshot. Downstream
+  review, merge, deploy, or release claims stay separate in the claim matrix and workflow action.
 - Missing access is not certainty. Name it under `Cannot Verify` and decide
   whether it blocks the next gate.
 
@@ -383,11 +383,11 @@ In `Next Action`, name only the first file/area or refer above; Light Mode may k
 
 Choose one:
 
-- **VERIFIED:** the agent's task fulfillment and claims are supported for the
-  identified repository snapshot. The contract is authoritative or human-
-  accepted, material evidence is snapshot-bound, and remaining cannot-verify
-  items do not block verification. This does not mean review passed or merge is
-  allowed.
+- **VERIFIED:** the accepted task is fulfilled for the identified snapshot. The
+  contract is authoritative or human-accepted, material task evidence is bound,
+  and remaining cannot-verify items do not block verification. Downstream review,
+  merge, deploy, or release claims stay separate in the claim matrix and workflow
+  action; unsupported downstream claims do not change the task-fulfillment verdict.
 - **PARTIALLY_VERIFIED:** the core work appears aligned, but important proof is
   missing, rejected as unbound, or only part of a claim is supported. Also the
   maximum verdict when the best available contract is an agent-derived
@@ -401,9 +401,9 @@ Choose one:
   there is serious scope drift, contradiction, broken behavior, weakened tests,
   unsafe migration/config, or another merge blocker.
 
-The verdict answers only whether this agent work is verified. It does not
-collapse testing, code review, release approval, or merge authority into the
-same result.
+The verdict answers only whether the accepted task is verified for this snapshot.
+It does not collapse testing, code review, release approval, or merge authority
+into the same result.
 
 ### 13. Route The Workflow Action
 
